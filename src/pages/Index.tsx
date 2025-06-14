@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 const Index = () => {
   const [query, setQuery] = useState('');
@@ -57,18 +58,21 @@ const Index = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FileText className="h-6 w-6 text-blue-600" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <FileText className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  NCD Literature Synthesis & Gap Identifier
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Intelligent analysis of non-communicable disease research literature
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                NCD Literature Synthesis & Gap Identifier
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Intelligent analysis of non-communicable disease research literature
-              </p>
-            </div>
+            <UserMenu />
           </div>
         </div>
       </header>
