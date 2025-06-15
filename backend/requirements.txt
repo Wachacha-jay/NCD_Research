@@ -1,0 +1,13 @@
+
+flask
+flask-cors
+langchain
+langchain-core
+langchain-community
+langchain-groq
+biopython
+arxiv
+aiohttp
+PyPDF2
+chromadb
+pydantic
