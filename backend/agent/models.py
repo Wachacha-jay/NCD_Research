@@ -3,6 +3,7 @@ from typing import List, Optional, Literal, Annotated, TypedDict
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
 
+
 class PaperMetadata(BaseModel):
     title: str
     abstract: str
@@ -12,6 +13,7 @@ class PaperMetadata(BaseModel):
     paper_id: str
     has_full_text: bool = False
     authors: List[str] = Field(default_factory=list)
+
 
 class ResearchState(TypedDict):
     messages: Annotated[List[BaseMessage], lambda x, y: x + y]

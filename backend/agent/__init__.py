@@ -1,14 +1,14 @@
 
-import asyncio
 from langchain_core.messages import HumanMessage
-from .env_setup import *
-from .models import ResearchState
+from .env_setup import *  # noqa: F403,F401
+from .models import ResearchState  # noqa: F401
 from .workflow import build_workflow
 
 # Provide direct reference to tools/vectorstore in tools.py
-from .tools import vectorstore_ref
+from .tools import vectorstore_ref  # noqa: F401
 
 _agent = None
+
 
 async def run_research_agent(query: str):
     global _agent
@@ -26,7 +26,9 @@ async def run_research_agent(query: str):
     }
     final_output = {}
     try:
-        final_state = await _agent.ainvoke(initial_state, {"recursion_limit": 100})
+        final_state = await _agent.ainvoke(
+            initial_state, {"recursion_limit": 100}
+        )
         final_output = {
             "query": final_state["research_query"],
             "summary": final_state["synthesized_summary"],

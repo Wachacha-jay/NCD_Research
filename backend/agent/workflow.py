@@ -6,12 +6,16 @@ from .models import ResearchState
 from .tools import tools
 from .nodes import agent_node, synthesize_node
 
+
 def should_continue(state: ResearchState) -> Literal["tools", "synthesize", "end"]:
     last_message = state["messages"][-1]
     from langchain_core.messages import AIMessage
-    if isinstance(last_message, AIMessage) and not getattr(last_message, 'tool_calls', None):
+    if isinstance(last_message, AIMessage) and not getattr(
+        last_message, 'tool_calls', None
+    ):
         return "synthesize"
     return "tools"
+
 
 def build_workflow():
     workflow = StateGraph(ResearchState)
