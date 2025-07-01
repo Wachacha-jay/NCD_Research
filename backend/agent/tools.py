@@ -1,5 +1,7 @@
 
 import asyncio
+import json
+import uuid
 from langchain_core.tools import tool
 from .models import PaperMetadata
 from Bio import Entrez
@@ -13,6 +15,14 @@ import os
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
+# Try to import Tavily
+try:
+    from langchain_tavily import TavilySearch
+    TAVILY_AVAILABLE = True
+except ImportError:
+    TAVILY_AVAILABLE = False
+    print("Tavily not available - install with: pip install langchain-tavily")
+
 CHROMA_DB_PATH = "./chroma_db_agent"
 os.makedirs(CHROMA_DB_PATH, exist_ok=True)
 embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
@@ -23,6 +33,10 @@ vectorstore = Chroma(
 
 @tool
 async def pubmed_search(query: str, limit: int = 5):
+    """
+    Searches PubMed for biomedical literature based on a query.
+    Returns a list of paper metadata.
+    """
     try:
         handle = Entrez.esearch(db="pubmed", term=query, retmax=limit)
         record = Entrez.read(handle)
@@ -45,7 +59,9 @@ async def pubmed_search(query: str, limit: int = 5):
                     "Abstract", {}
                 ).get("AbstractText", [])
                 paper = PaperMetadata(
-                    title=str(article_info.get("ArticleTitle", "No Title Found")),
+                    title=str(article_info.get(
+                        "ArticleTitle", "No Title Found"
+                    )),
                     abstract=" ".join(abstract_parts) if abstract_parts else (
                         "No Abstract Found."
                     ),
@@ -75,14 +91,21 @@ async def pubmed_search(query: str, limit: int = 5):
 
 @tool
 async def arxiv_search(query: str, limit: int = 5):
+    """
+    Searches arXiv for pre-print papers, especially in physics, math, and
+    computer science. Returns a list of paper metadata.
+    """
     try:
+        client = arxiv.Client()
         search = arxiv.Search(
             query=query,
             max_results=limit,
             sort_by=arxiv.SortCriterion.Relevance
         )
         papers = []
-        for result in await asyncio.to_thread(lambda: list(search.results())):
+        for result in await asyncio.to_thread(
+            lambda: list(client.results(search))
+        ):
             paper = PaperMetadata(
                 title=result.title,
                 abstract=result.summary.replace("\n", " "),
@@ -107,6 +130,11 @@ async def arxiv_search(query: str, limit: int = 5):
 
 @tool
 async def download_and_extract_pdf(url: str, paper_id: str):
+    """
+    Downloads a PDF from a URL, extracts its text, and stores it in a
+    vector database. This tool should be used when a paper's full text
+    is needed for synthesis.
+    """
     headers = {"User-Agent": "ResearchAgent/1.0"}
     async with aiohttp.ClientSession() as session:
         try:
@@ -147,5 +175,15 @@ async def download_and_extract_pdf(url: str, paper_id: str):
             )
 
 
+# Initialize tools list
 tools = [pubmed_search, arxiv_search, download_and_extract_pdf]
+
+# Add Tavily search if available
+if TAVILY_AVAILABLE:
+    tavily_search = TavilySearch(
+        max_results=5,
+        tavily_api_key=os.getenv("TAVILY_API_KEY")
+    )
+    tools.append(tavily_search)
+
 vectorstore_ref = vectorstore

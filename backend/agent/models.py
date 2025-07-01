@@ -9,7 +9,7 @@ class PaperMetadata(BaseModel):
     abstract: str
     url: str
     year: Optional[str] = None
-    source: Literal["PubMed", "arXiv", "Semantic Scholar", "PDF", "Error"]
+    source: Literal["PubMed", "arXiv", "Semantic Scholar", "PDF", "Error", "Tavily"]
     paper_id: str
     has_full_text: bool = False
     authors: List[str] = Field(default_factory=list)

@@ -5,9 +5,11 @@ langchain
 langchain-core
 langchain-community
 langchain-groq
+langchain-tavily
 biopython
 arxiv
 aiohttp
 PyPDF2
 chromadb
 pydantic
+sentence-transformers
